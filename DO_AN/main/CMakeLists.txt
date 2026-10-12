@@ -1,0 +1,2 @@
+idf_component_register(SRCS "app_control.c" "app_device.c" "app_mqtt.c" "app_wifi.c" "sensor_process.c" "sensor_data.c" "Sharp_GP2Y1010AU0F.c" "dht11.c" "mq_2.c" "main.c"
+                    INCLUDE_DIRS ".")
