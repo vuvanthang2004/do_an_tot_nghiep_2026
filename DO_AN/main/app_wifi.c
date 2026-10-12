@@ -11,7 +11,7 @@
 
 #include "freertos/event_groups.h"
 
-/* Thay bằng tên và mật khẩu Wi-Fi của bạn */
+
 #define WIFI_SSID       "TP-Link_4CC4"
 #define WIFI_PASSWORD   "93945271"
 
