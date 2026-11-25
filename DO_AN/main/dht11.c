@@ -114,15 +114,15 @@ esp_err_t dht11_read(dht11_data_t *data)
     uint8_t bytes[5] = {0};
 
     esp_err_t err;
-
-    // 1. ESP32 keo DATA xuong thap de bat dau giao tiep
+ // 1. ESP32 keo DATA xuong thap de gui tin hieu yeu cau de dht11 bat dau giao tiep
     err = gpio_set_level(DHT11_GPIO, 0);
 
     if (err != ESP_OK) {
         return err;
     }
 
-    // DHT11 can xung start toi thieu khoang 18 ms
+    // DHT11 can xung start toi thieu khoang 18 ms de bao cho dht11 biet rang esp can doc du lieu
+
     esp_rom_delay_us(20000);
 
     // 2. Tha DATA len cao
@@ -131,7 +131,7 @@ esp_err_t dht11_read(dht11_data_t *data)
     if (err != ESP_OK) {
         return err;
     }
-
+// thoi gian delay nay de cho cho dht11 co thoi gian chuyen sang che do truyen data ve esp
     esp_rom_delay_us(30);
 
     // 3. Chuyen GPIO sang input de nhan du lieu

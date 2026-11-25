@@ -1,14 +1,11 @@
 
 #include "app_wifi.h"
-
 #include <stdbool.h>
-
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-
 #include "freertos/event_groups.h"
 
 
@@ -28,14 +25,12 @@ static esp_event_handler_instance_t wifi_handler_instance;
 static esp_event_handler_instance_t ip_handler_instance;
 
 
-/*
- * Xử lý sự kiện Wi-Fi và IP
- */
+/* Xử lý sự kiện Wi-Fi và IP*/
 static void wifi_event_handler(
-    void *arg,
-    esp_event_base_t event_base,
-    int32_t event_id,
-    void *event_data)
+    void *arg,/*Dữ liệu phụ mà bạn có thể truyền vào*/
+    esp_event_base_t event_base,/*Nhóm sự kiện, ví dụ WIFI_EVENT hoặc IP_EVENT*/
+    int32_t event_id,/*Sự kiện cụ thể trong nhóm*/
+    void *event_data)/*Con trỏ đến dữ liệu bổ sung của sự kiện*/
 {
     if (event_base == WIFI_EVENT &&
         event_id == WIFI_EVENT_STA_START)

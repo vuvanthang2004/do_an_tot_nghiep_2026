@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air Quality Monitoring | Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --text: #172033;
+      --muted: #718096;
+      --border: #e6ebf2;
+      --primary: #2563eb;
+      --primary-soft: #eaf1ff;
+      --green: #16a34a;
+      --green-soft: #e9f8ef;
+      --yellow: #d97706;
+      --yellow-soft: #fff6df;
+      --red: #dc2626;
+      --red-soft: #fff0f0;
+      --sidebar: #111c36;
+      --sidebar-muted: #a8b4cc;
+      --shadow: 0 8px 28px rgba(24, 39, 75, .06);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 248px; background: var(--sidebar); color: white;
+      padding: 24px 16px; display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 28px; }
+    .brand-logo {
+      width: 42px; height: 42px; display: grid; place-items: center;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      border-radius: 13px; font-size: 22px;
+    }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .2px; }
+    .brand small { color: var(--sidebar-muted); font-size: 11px; }
+    .nav-label { color: #7585a5; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; padding: 12px 12px 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      color: var(--sidebar-muted); text-decoration: none; border-radius: 10px;
+      margin: 3px 0; font-size: 14px; transition: .2s;
+    }
+    .nav-item:hover, .nav-item.active { background: #243454; color: #fff; }
+    .nav-item.active { box-shadow: inset 3px 0 #60a5fa; }
+    .nav-icon { width: 22px; text-align: center; font-size: 17px; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 10px 0; border-top: 1px solid #2a3854; color: var(--sidebar-muted); font-size: 12px; }
+    .main { min-width: 0; flex: 1; }
+    .topbar {
+      height: 78px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .topbar h1 { font-size: 20px; margin: 0; }
+    .topbar p { margin: 5px 0 0; font-size: 12px; color: var(--muted); }
+    .top-actions { display: flex; align-items: center; gap: 16px; }
+    .connection { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--green); background: var(--green-soft); padding: 8px 11px; border-radius: 20px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .profile { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #dbeafe; color: #1d4ed8; font-weight: 700; }
+    .profile-name { font-size: 13px; font-weight: 600; }
+    .profile-role { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .content { padding: 28px 32px 40px; max-width: 1600px; margin: auto; }
+    .welcome-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 22px; }
+    .welcome-row h2 { font-size: 22px; margin: 0; }
+    .welcome-row p { color: var(--muted); font-size: 13px; margin: 7px 0 0; }
+    .btn { border: 1px solid var(--border); background: white; padding: 10px 14px; border-radius: 9px; color: var(--text); font-size: 13px; font-weight: 600; }
+    .btn:hover { background: #f8fafc; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-danger { color: var(--red); border-color: #fecaca; background: #fff; }
+    .grid { display: grid; gap: 18px; }
+    .sensor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .sensor-card { padding: 20px; position: relative; overflow: hidden; }
+    .sensor-head { display: flex; align-items: center; justify-content: space-between; }
+    .sensor-title { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .sensor-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; font-size: 21px; background: var(--primary-soft); }
+    .sensor-value { font-size: 29px; font-weight: 750; margin: 16px 0 6px; letter-spacing: -.5px; }
+    .sensor-unit { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .sensor-foot { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 12px; }
+    .trend { color: var(--green); font-weight: 700; }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 28px 0 15px; }
+    .section-title h3 { font-size: 16px; margin: 0; }
+    .section-title p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .main-grid { grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); }
+    .card-header { padding: 20px 22px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-header h3 { margin: 0; font-size: 15px; }
+    .card-header p { color: var(--muted); margin: 6px 0 0; font-size: 12px; }
+    .card-body { padding: 18px 22px 22px; }
+    select { border: 1px solid var(--border); background: white; border-radius: 8px; padding: 8px 10px; color: #475569; font-size: 12px; }
+    .chart-wrap { height: 260px; position: relative; }
+    canvas { width: 100%; height: 100%; display: block; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 11px; color: var(--muted); margin-top: 12px; }
+    .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .quality-panel { display: flex; gap: 18px; align-items: center; padding: 18px; background: #f8fbff; border: 1px solid #e7efff; border-radius: 13px; }
+    .quality-ring { width: 94px; height: 94px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(#16a34a 0 78%, #e5e7eb 78% 100%); position: relative; }
+    .quality-ring:before { content: ""; position: absolute; inset: 9px; background: white; border-radius: 50%; }
+    .quality-ring span { position: relative; font-size: 23px; font-weight: 800; color: #15803d; }
+    .quality-status { display: inline-block; padding: 5px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; background: var(--green-soft); color: var(--green); }
+    .quality-panel h2 { font-size: 21px; margin: 8px 0 5px; }
+    .quality-panel p { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0; }
+    .quality-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .mini-stat { background: #f8fafc; border-radius: 10px; padding: 12px; }
+    .mini-stat span { display: block; color: var(--muted); font-size: 11px; }
+    .mini-stat strong { display: block; font-size: 14px; margin-top: 6px; }
+    .device-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .device-card { padding: 18px; }
+    .device-top { display: flex; justify-content: space-between; align-items: center; }
+    .device-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: #f1f5f9; font-size: 21px; }
+    .device-card h4 { margin: 15px 0 5px; font-size: 14px; }
+    .device-card p { margin: 0; font-size: 12px; color: var(--muted); }
+    .status-pill { font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 20px; color: #64748b; background: #f1f5f9; }
+    .status-pill.on { color: #15803d; background: #dcfce7; }
+    .switch { position: relative; width: 42px; height: 24px; display: inline-block; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 30px; transition: .2s; }
+    .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; box-shadow: 0 1px 3px #0002; }
+    .switch input:checked + .slider { background: #2563eb; }
+    .switch input:checked + .slider:before { transform: translateX(18px); }
+    .mode-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 17px 20px; }
+    .mode-row strong { font-size: 14px; }
+    .mode-row p { font-size: 12px; color: var(--muted); margin: 5px 0 0; }
+    .segmented { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; }
+    .segmented button { border: 0; background: transparent; padding: 9px 16px; border-radius: 7px; color: #64748b; font-weight: 700; font-size: 12px; }
+    .segmented button.active { background: white; color: var(--primary); box-shadow: 0 1px 4px #0001; }
+    .lower-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+    th { text-align: left; color: #8490a5; font-weight: 600; background: #fafbfd; }
+    th, td { padding: 13px 18px; border-bottom: 1px solid #edf1f6; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .badge { padding: 5px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+    .badge.good { color: #15803d; background: #dcfce7; }
+    .badge.medium { color: #b45309; background: #fef3c7; }
+    .badge.bad { color: #b91c1c; background: #fee2e2; }
+    .alert-list { display: flex; flex-direction: column; gap: 12px; }
+    .alert-item { display: flex; gap: 12px; padding: 13px; border-radius: 11px; background: #fffaf3; border: 1px solid #ffedd5; }
+    .alert-item.critical { background: #fff5f5; border-color: #fee2e2; }
+    .alert-symbol { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border-radius: 9px; background: #ffedd5; }
+    .alert-item.critical .alert-symbol { background: #fee2e2; }
+    .alert-item strong { font-size: 12px; display: block; }
+    .alert-item p { font-size: 11px; color: var(--muted); margin: 5px 0; line-height: 1.45; }
+    .alert-time { font-size: 10px; color: #94a3b8; }
+    .account-row { display: flex; align-items: center; gap: 12px; }
+    .account-row .avatar { width: 46px; height: 46px; }
+    .account-info strong { display: block; font-size: 13px; }
+    .account-info small { color: var(--muted); font-size: 11px; }
+    .account-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .footer { text-align: center; color: #94a3b8; font-size: 11px; padding: 25px 0 0; }
+    .toast { position: fixed; right: 24px; bottom: 24px; background: #172033; color: white; padding: 13px 18px; border-radius: 10px; box-shadow: var(--shadow); font-size: 13px; z-index: 50; opacity: 0; transform: translateY(10px); transition: .25s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .hidden { display: none !important; }
+    @media (max-width: 1200px) {
+      .sensor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .main-grid, .lower-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .sidebar { width: 72px; padding: 18px 9px; }
+      .brand { justify-content: center; padding: 0 0 25px; }
+      .brand-text, .nav-label, .nav-item span:not(.nav-icon), .sidebar-bottom { display: none; }
+      .nav-item { justify-content: center; padding: 13px 8px; }
+      .nav-icon { font-size: 20px; }
+      .topbar { padding: 0 16px; }
+      .connection { display: none; }
+      .content { padding: 20px 14px; }
+      .sensor-grid, .device-grid { grid-template-columns: 1fr 1fr; }
+      .welcome-row { align-items: flex-start; flex-direction: column; }
+      .profile-name, .profile-role { display: none; }
+      .quality-panel { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 460px) {
+      .sensor-grid, .device-grid { grid-template-columns: 1fr; }
+      .topbar h1 { font-size: 16px; }
+      .chart-wrap { height: 220px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">🌿</div>
+      <div class="brand-text"><strong>Air Monitor</strong><small>SMART LAB SYSTEM</small></div>
+    </div>
+    <div class="nav-label">MENU CHÍNH</div>
+    <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span><span>Tổng quan</span></a>
+    <a class="nav-item" href="#sensors"><span class="nav-icon">⌁</span><span>Giám sát cảm biến</span></a>
+    <a class="nav-item" href="#ai"><span class="nav-icon">✦</span><span>Phân tích AI</span></a>
+    <a class="nav-item" href="#devices"><span class="nav-icon">⚙</span><span>Điều khiển thiết bị</span></a>
+    <a class="nav-item" href="#alerts"><span class="nav-icon">♧</span><span>Lịch sử cảnh báo</span></a>
+    <a class="nav-item" href="#history"><span class="nav-icon">◷</span><span>Lịch sử dữ liệu</span></a>
+    <div class="nav-label">TÀI KHOẢN</div>
+    <a class="nav-item" href="#account"><span class="nav-icon">♙</span><span>Thông tin tài khoản</span></a>
+    <a class="nav-item" href="#" id="sidebarLogout"><span class="nav-icon">⇥</span><span>Đăng xuất</span></a>
+    <div class="sidebar-bottom">Đồ án tốt nghiệp · ESP32 + AI<br>Demo giao diện</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Hệ thống giám sát chất lượng không khí phòng thực hành</p>
+      </div>
+      <div class="top-actions">
+        <div class="connection"><span class="dot"></span><span id="connectionText">Demo đang hoạt động</span></div>
+        <div class="profile">
+          <div class="avatar" id="topAvatar">U</div>
+          <div><div class="profile-name" id="topUserName">Người dùng</div><div class="profile-role">Quản trị hệ thống</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content" id="overview">
+      <div class="welcome-row">
+        <div>
+          <h2>Xin chào, <span id="welcomeName">bạn</span> 👋</h2>
+          <p>Dưới đây là tình trạng không khí và thiết bị trong phòng thực hành.</p>
+        </div>
+        <button class="btn" id="refreshBtn">↻ Làm mới dữ liệu</button>
+      </div>
+
+      <section id="sensors">
+        <div class="grid sensor-grid">
+          <article class="card sensor-card">
+            <div class="sensor-head"><span class="sensor-title">Nhiệt độ</span><span class="sensor-icon">🌡️</span></div>
+            <div class="sensor-value"><span id="temperature">--</span><span class="sensor-unit"> °C</span></div>
+            <div class="sensor-foot"><span class="trend">●</span> <span>Giá trị cảm biến DHT22</span></div>
+          </article>
+          <article class="card sensor-card">
+            <div class="sensor-head"><span class="sensor-title">Độ ẩm</span><span class="sensor-icon" style="background:#e8f7ff">💧</span></div>
+            <div class="sensor-value"><span id="humidity">--</span><span class="sensor-unit"> %</span></div>
+            <div class="sensor-foot"><span class="trend">●</span> <span>Giá trị cảm biến DHT22</span></div>
+          </article>
+          <article class="card sensor-card">
+            <div class="sensor-head"><span class="sensor-title">Khí MQ-2</span><span class="sensor-icon" style="background:#fff4e5">☁️</span></div>
+            <div class="sensor-value"><span id="mq2">--</span><span class="sensor-unit"> % (demo)</span></div>
+            <div class="sensor-foot"><span>Giá trị quy đổi minh họa</span></div>
+          </article>
+          <article class="card sensor-card">
+            <div class="sensor-head"><span class="sensor-title">PM2.5</span><span class="sensor-icon" style="background:#f2eaff">🌫️</span></div>
+            <div class="sensor-value"><span id="pm25">--</span><span class="sensor-unit"> µg/m³</span></div>
+            <div class="sensor-foot"><span class="trend">●</span> <span>GP2Y1010AU0F · demo</span></div>
+          </article>
+        </div>
+      </section>
+
+      <div class="section-title"><div><h3>Phân tích chất lượng không khí</h3><p>Đánh giá minh họa từ mô hình AI Random Forest</p></div><span style="font-size:11px;color:#94a3b8">Cập nhật: <span id="lastUpdate">vừa xong</span></span></div>
+      <div class="grid main-grid">
+        <section class="card">
+          <div class="card-header"><div><h3>Lịch sử cảm biến</h3><p>Theo dõi các thông số theo thời gian</p></div>
+            <select id="timeRange"><option value="12">12 điểm gần nhất</option><option value="24">24 điểm gần nhất</option><option value="36">36 điểm gần nhất</option></select>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="sensorChart" aria-label="Biểu đồ cảm biến"></canvas></div>
+            <div class="chart-legend">
+              <span><i class="legend-dot" style="background:#2563eb"></i>Nhiệt độ (°C)</span>
+              <span><i class="legend-dot" style="background:#06b6d4"></i>Độ ẩm (%)</span>
+              <span><i class="legend-dot" style="background:#f59e0b"></i>PM2.5 (µg/m³)</span>
+            </div>
+          </div>
+        </section>
+        <section class="card" id="ai">
+          <div class="card-header"><div><h3>Kết quả phân tích AI</h3><p>Phân loại chất lượng không khí</p></div><span class="status-pill">Random Forest</span></div>
+          <div class="card-body">
+            <div class="quality-panel">
+              <div class="quality-ring" id="qualityRing"><span id="qualityScore">--</span></div>
+              <div><span class="quality-status" id="qualityBadge">--</u></span><h2 id="qualityText">--</h2><p id="qualityDescription">Các chỉ số vẫn chưa được cập nhật.</p></div>
+            </div>
+            <div class="quality-details">
+              <div class="mini-stat"><span>Độ tin cậy minh họa</span><strong id="confidence">--%</strong></div>
+              <div class="mini-stat"><span>Trạng thái mô hình</span><strong  id="modelStatus" style="color:#16a34a">Chưa có</strong></div>
+            </div>
+            <p style="font-size:10px;color:#94a3b8;line-height:1.5;margin:12px 0 0">Lưu ý: Kết quả hiện nay vẫn chưa có.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="section-title" id="devices"><div><h3>Điều khiển thiết bị</h3><p>Chuyển chế độ và theo dõi trạng thái FAN, TEC, ION</p></div></div>
+      <section class="card">
+        <div class="mode-row">
+          <div><strong>Chế độ vận hành</strong><p id="modeDescription">AUTO: hệ thống tự động điều khiển thiết bị (demo).</p></div>
+          <div class="segmented"><button class="active" id="autoBtn">AUTO</button><button id="manualBtn">MANUAL</button></div>
+        </div>
+        <div style="padding:0 20px 18px">
+          <div class="grid device-grid">
+            <article class="card device-card">
+              <div class="device-top"><span class="device-icon">🌀</span><span class="status-pill" id="fanStatus">ĐANG TẮT</span></div>
+              <h4>FAN · Quạt thông gió</h4><p>Lưu thông không khí trong phòng</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px"><small style="color:#64748b" id="fanHint">Điều khiển tự động</small><label class="switch"><input type="checkbox" id="fanSwitch" disabled><span class="slider"></span></label></div>
+            </article>
+            <article class="card device-card">
+              <div class="device-top"><span class="device-icon">❄️</span><span class="status-pill" id="tecStatus">ĐANG TẮT</span></div>
+              <h4>TEC · Làm mát</h4><p>Hỗ trợ điều chỉnh nhiệt độ phòng</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px"><small style="color:#64748b" id="tecHint">Điều khiển tự động</small><label class="switch"><input type="checkbox" id="tecSwitch" disabled><span class="slider"></span></label></div>
+            </article>
+            <article class="card device-card">
+              <div class="device-top"><span class="device-icon">✨</span><span class="status-pill" id="ionStatus">ĐANG TẮT</span></div>
+              <h4>ION · Ion hóa</h4><p>Hỗ trợ xử lý không khí theo thiết kế</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px"><small style="color:#64748b" id="ionHint">Điều khiển tự động</small><label class="switch"><input type="checkbox" id="ionSwitch" disabled><span class="slider"></span></label></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-title"><div><h3>Lịch sử và cảnh báo</h3><p>Theo dõi các lần cập nhật và cảnh báo của hệ thống</p></div></div>
+      <div class="grid lower-grid">
+        <section class="card" id="history">
+          <div class="card-header"><div><h3>Lịch sử dữ liệu cảm biến</h3><p>Dữ liệu minh họa gần đây</p></div><button class="btn" id="exportBtn">↓ Xuất CSV</button></div>
+          <div class="card-body table-wrap" style="padding-left:0;padding-right:0">
+            <table><thead><tr><th>Thời gian</th><th>Nhiệt độ</th><th>Độ ẩm</th><th>PM2.5</th><th>Đánh giá</th></tr></thead><tbody id="historyBody"></tbody></table>
+          </div>
+        </section>
+        <section class="card" id="alerts">
+          <div class="card-header"><div><h3>Lịch sử cảnh báo</h3><p>Các thông báo gần đây</p></div><span class="status-pill" id="alertCount">2 thông báo</span></div>
+          <div class="card-body"><div class="alert-list" id="alertList">
+            <div class="alert-item"><div class="alert-symbol">⚠</div><div><strong>Ví dụ cảnh báo mức trung bình</strong><p>Đây là cảnh báo minh họa. Khi kết nối backend, nội dung sẽ lấy từ hệ thống thật.</p><span class="alert-time">10:32 · Demo</span></div></div>
+            <div class="alert-item critical"><div class="alert-symbol">!</div><div><strong>Ví dụ cảnh báo chất lượng không khí</strong><p>Kiểm tra cảm biến và ngưỡng cảnh báo trước khi vận hành thực tế.</p><span class="alert-time">09:45 · Demo</span></div></div>
+          </div></div>
+        </section>
+      </div>
+
+      <div class="section-title" id="account"><div><h3>Thông tin tài khoản</h3><p>Thông tin phiên đăng nhập hiện tại</p></div></div>
+      <section class="card">
+        <div class="card-body">
+          <div class="account-row"><div class="avatar" id="accountAvatar">U</div><div class="account-info"><strong id="accountName">Người dùng</strong><small id="accountEmail">Chưa có email tài khoản</small></div></div>
+          <div class="account-actions"><button class="btn" id="profileBtn">Thông tin tài khoản</button><button class="btn btn-danger" id="logoutBtn">Đăng xuất</button></div>
+        </div>
+      </section>
+      <div class="footer">Air Quality Monitoring System · ESP32 + AI · Giao diện demo phục vụ đồ án</div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===================== DEMO FRONTEND =====================
+
+  const $ = (id) => document.getElementById(id);
+  const API_URL = "http://127.0.0.1:8000";
+  let mode = "AUTO";
+  let deviceState = { FAN: false, TEC: false, ION: false };
+  let sensorHistory = [];
+  let toastTimer;
+
+  function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  function getUserInfo() {
+    // Tạm đọc thông tin từ localStorage nếu trang login đã lưu.
+    // Tên key có thể cần đổi theo code login thực tế của bạn.
+    const possibleName = localStorage.getItem("fullname") || localStorage.getItem("username") || localStorage.getItem("user");
+    const possibleEmail = localStorage.getItem("email");
+    if (possibleName) {
+      $("welcomeName").textContent = possibleName;
+      $("topUserName").textContent = possibleName;
+      $("accountName").textContent = possibleName;
+      $("topAvatar").textContent = possibleName.trim().charAt(0).toUpperCase();
+      $("accountAvatar").textContent = possibleName.trim().charAt(0).toUpperCase();
+    }
+    if (possibleEmail) $("accountEmail").textContent = possibleEmail;
+  }
+
+
+  function applyDemoAutoControl(quality, temperature) {
+    // Logic demo: cần thay bằng quyết định từ backend/ESP32 khi tích hợp thật.
+    deviceState.FAN = quality !== "good";
+    deviceState.ION = quality === "bad";
+    deviceState.TEC = temperature >= 30;
+    renderDevices();
+  }
+
+  function renderDevices() {
+    ["FAN", "TEC", "ION"].forEach(key => {
+      const input = $(key.toLowerCase() + "Switch");
+      const status = $(key.toLowerCase() + "Status");
+      const hint = $(key.toLowerCase() + "Hint");
+      input.checked = !!deviceState[key];
+      input.disabled = mode === "AUTO";
+      status.textContent = deviceState[key] ? "ĐANG BẬT" : "ĐANG TẮT";
+      status.classList.toggle("on", !!deviceState[key]);
+      hint.textContent = mode === "AUTO" ? "Điều khiển tự động" : "Điều khiển thủ công";
+    });
+    $("modeDescription").textContent = mode === "AUTO"
+      ? "AUTO: hệ thống tự động điều khiển thiết bị (demo)."
+      : "MANUAL: bạn có thể bật/tắt thiết bị bằng các công tắc.";
+  }
+  
+
+async function updateDashboard() {
+    try {
+        const response = await fetch(`${API_URL}/api/sensors`);
+
+        if (!response.ok) {
+            throw new Error("Không lấy được dữ liệu từ Backend");
+        }
+
+        const data = await response.json();
+
+        if (!data) return;
+
+        // Chuyển dữ liệu Backend thành đối tượng sensor
+        const sensor = {
+            temperature: Number(data.temperature),
+            humidity: Number(data.humidity),
+            mq2: Number(data.mq2),
+            pm25: Number(data.pm25),
+            time: data.timestamp ? new Date(data.timestamp) : new Date()
+        };
+
+        // Kiểm tra dữ liệu hợp lệ
+        if (
+            !Number.isFinite(sensor.temperature) ||
+            !Number.isFinite(sensor.humidity) ||
+            !Number.isFinite(sensor.mq2) ||
+            !Number.isFinite(sensor.pm25)
+        ) {
+            console.error("Dữ liệu cảm biến không hợp lệ:", data);
+            return;
+        }
+
+        // Cập nhật 4 ô cảm biến
+        $("temperature").textContent = sensor.temperature.toFixed(1);
+        $("humidity").textContent = sensor.humidity.toFixed(1);
+        $("mq2").textContent = sensor.mq2.toFixed(1);
+        $("pm25").textContent = sensor.pm25.toFixed(1);
+
+        // Thêm dữ liệu vào lịch sử
+        sensorHistory.push(sensor);
+
+        // Chỉ giữ tối đa 1000 mẫu
+        if (sensorHistory.length > 1000) {
+            sensorHistory.shift();
+        }
+
+        // Cập nhật bảng và biểu đồ
+        renderHistoryTable();
+        drawChart();
+
+        // Cập nhật thời gian
+        $("lastUpdate").textContent =
+            sensor.time.toLocaleTimeString("vi-VN");
+
+        console.log("Đã cập nhật Dashboard:", sensor);
+
+    } catch (error) {
+        console.error("Lỗi kết nối Backend:", error);
+    }
+}
+
+
+async function updateAI() {
+    try {
+        const response = await fetch(`${API_URL}/api/ai`);
+
+        if (!response.ok) {
+            throw new Error("Không lấy được kết quả AI");
+        }
+
+        const data = await response.json();
+
+        if (!data) return;
+
+        console.log("Kết quả AI:", data);
+
+        // Cập nhật điểm tin cậy
+        $("confidence").textContent = `${data.confidence}%`;
+
+        // Cập nhật phân loại chất lượng không khí
+        const quality = String(data.air_quality).toLowerCase();
+
+        const qualityMap = {
+            good: "Tốt",
+            moderate: "Trung bình",
+            poor: "Kém"
+        };
+
+        $("qualityText").textContent =
+            qualityMap[quality] || data.air_quality;
+
+    } catch (error) {
+        console.error("Lỗi cập nhật AI:", error);
+    }
+}
+
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    $("autoBtn").classList.toggle("active", mode === "AUTO");
+    $("manualBtn").classList.toggle("active", mode === "MANUAL");
+    renderDevices();
+    if (mode === "AUTO") updateDashboard();
+    showToast("Đã chuyển sang chế độ " + mode + " (demo)");
+  }
+
+  function renderHistoryTable() {
+    const rows = sensorHistory.slice(-6).reverse();
+    $("historyBody").innerHTML = rows.map(row => {
+      const quality = row.pm25 < 15 ? ["Tốt", "good"] : row.pm25 < 35 ? ["Trung bình", "medium"] : ["Kém", "bad"];
+      return `<tr>
+        <td>${row.time.toLocaleTimeString("vi-VN", {hour:"2-digit", minute:"2-digit", second:"2-digit"})}</td>
+        <td>${row.temperature.toFixed(1)} °C</td>
+        <td>${row.humidity.toFixed(1)} %</td>
+        <td>${row.pm25.toFixed(1)} µg/m³</td>
+        <td><span class="badge ${quality[1]}">${quality[0]}</span></td>
+      </tr>`;
+    }).join("");
+  }
+
+  function drawChart() {
+    const canvas = $("sensorChart");
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(300, rect.width * dpr);
+    canvas.height = Math.max(180, rect.height * dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = rect.height;
+    ctx.clearRect(0, 0, w, h);
+    const pad = {left: 34, right: 12, top: 12, bottom: 26};
+    const cw = w - pad.left - pad.right, ch = h - pad.top - pad.bottom;
+    const count = Number($("timeRange").value);
+    const data = sensorHistory.slice(-count);
+    if (!data.length) return;
+
+    // Grid + labels. Các đường được chuẩn hóa theo từng thông số để dễ quan sát xu hướng.
+    ctx.font = "10px Segoe UI, Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.strokeStyle = "#edf1f6";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.top + ch * i / 4;
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+      ctx.fillText(String(100 - i * 25), 2, y + 3);
+    }
+    const series = [
+      {key:"temperature", color:"#2563eb", min:15, max:40},
+      {key:"humidity", color:"#06b6d4", min:0, max:100},
+      {key:"pm25", color:"#f59e0b", min:0, max:100}
+    ];
+    series.forEach(s => {
+      ctx.beginPath();
+      data.forEach((item, i) => {
+        const x = pad.left + (data.length === 1 ? 0 : i / (data.length - 1)) * cw;
+        const normalized = Math.max(0, Math.min(1, (item[s.key] - s.min) / (s.max - s.min)));
+        const y = pad.top + (1 - normalized) * ch;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.4; ctx.stroke();
+    });
+    const labels = Math.min(6, data.length);
+    for (let i = 0; i < labels; i++) {
+      const idx = Math.round(i * (data.length - 1) / Math.max(1, labels - 1));
+      const x = pad.left + (data.length === 1 ? 0 : idx / (data.length - 1)) * cw;
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillText(data[idx].time.toLocaleTimeString("vi-VN", {hour:"2-digit", minute:"2-digit"}), x - 18, h - 6);
+    }
+  }
+
+  function exportCSV() {
+    const header = "timestamp,temperature,humidity,pm25\\n";
+    const lines = sensorHistory.map(x => `${x.time.toISOString()},${x.temperature.toFixed(2)},${x.humidity.toFixed(2)},${x.pm25.toFixed(2)}`).join("\\n");
+    const blob = new Blob([header + lines], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "air_quality_history_demo.csv"; a.click();
+    URL.revokeObjectURL(url);
+    showToast("Đã xuất dữ liệu demo ra CSV");
+  }
+
+function logout() {
+    // Xóa thông tin đăng nhập
+    ["fullname", "username", "user", "email", "token", "access_token", "isLoggedIn"]
+        .forEach(key => localStorage.removeItem(key));
+
+    // Chuyển về trang đăng nhập
+    window.location.replace("login.html");
+}
+
+  $("autoBtn").addEventListener("click", () => setMode("AUTO"));
+  $("manualBtn").addEventListener("click", () => setMode("MANUAL"));
+  ["FAN", "TEC", "ION"].forEach(key => {
+    $(key.toLowerCase() + "Switch").addEventListener("change", (event) => {
+      if (mode !== "MANUAL") return;
+      deviceState[key] = event.target.checked;
+      renderDevices();
+      showToast(key + (event.target.checked ? " đã bật" : " đã tắt") + " (demo)");
+      // TODO: gửi lệnh điều khiển đến FastAPI/MQTT tại đây.
+    });
+  });
+  $("refreshBtn").addEventListener("click", () => { updateDashboard(); showToast("Đã làm mới dữ liệu demo"); });
+  $("timeRange").addEventListener("change", drawChart);
+  $("exportBtn").addEventListener("click", exportCSV);
+  $("profileBtn").addEventListener("click", () => showToast("Thông tin tài khoản đang hiển thị bên dưới."));
+  $("logoutBtn").addEventListener("click", logout);
+  $("sidebarLogout").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+  document.querySelectorAll(".nav-item[href^='#']").forEach(item => {
+    item.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach(nav => nav.classList.remove("active"));
+      item.classList.add("active");
+    });
+  });
+
+// Kiểm tra trạng thái đăng nhập
+function checkLogin() {
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.replace("login.html");
+    }
+}
+
+// Kiểm tra khi mở Dashboard
+checkLogin();
+
+// Kiểm tra khi Chrome quay lại Dashboard
+window.addEventListener("pageshow", checkLogin);
+
+// Khởi tạo Dashboard
+getUserInfo();
+renderDevices();
+
+updateDashboard();
+updateAI();
+setInterval(updateDashboard, 3000);
+window.addEventListener("resize", drawChart);
+</script>
+</body>
+</html>

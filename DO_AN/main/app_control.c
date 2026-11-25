@@ -13,7 +13,7 @@
 static const char *TAG = "APP_CONTROL";
 
 #define MQTT_TOPIC_COMMAND "lab/air/command"
-
+// De che do auto cho cac du lieu o trong app_control_mode
 static app_control_mode_t current_mode = APP_MODE_AUTO;
 
 static bool fan_state = false;

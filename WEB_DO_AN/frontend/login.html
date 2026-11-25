@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Air Quality Monitoring</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #eaf4ff, #f5f9ff);
+            padding: 20px;
+        }
+
+        .login-container {
+            display: flex;
+            width: 900px;
+            max-width: 100%;
+            min-height: 520px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0, 60, 130, 0.15);
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(145deg, #0d6efd, #084298);
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .login-left h1 {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .login-left p {
+            line-height: 1.7;
+            color: #dceaff;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 50px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-right h2 {
+            font-size: 28px;
+            color: #17365d;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7b8794;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #d6e0eb;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 70px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #0d6efd;
+            cursor: pointer;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #526273;
+        }
+
+        a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #0d6efd;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-button:hover {
+            background: #084298;
+            transform: translateY(-1px);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #667788;
+            font-size: 14px;
+        }
+
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #dc3545;
+        }
+
+        @media (max-width: 700px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-left {
+                padding: 30px;
+                text-align: center;
+            }
+
+            .login-left h1 {
+                font-size: 24px;
+            }
+
+            .login-right {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <!-- Phần giới thiệu hệ thống -->
+        <div class="login-left">
+            <div class="logo">🌿</div>
+
+            <h1>Air Quality Monitoring</h1>
+
+            <p>
+                Hệ thống giám sát chất lượng không khí
+                trong phòng thực hành sử dụng ESP32 và AI.
+            </p>
+
+            <p style="margin-top: 20px;">
+                Đo lường · Giám sát · Đánh giá · Cảnh báo · Điều khiển
+            </p>
+        </div>
+
+        <!-- Phần đăng nhập -->
+        <div class="login-right">
+
+            <h2>Đăng nhập</h2>
+
+            <p class="subtitle">
+                Chào mừng bạn quay trở lại hệ thống!
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label for="username">Email hoặc tên đăng nhập</label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Nhập email hoặc tên đăng nhập"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Nhập mật khẩu"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            id="togglePassword"
+                        >
+                            Hiện
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+
+                    <label class="remember">
+                        <input type="checkbox" id="remember">
+                        Ghi nhớ đăng nhập
+                    </label>
+
+                    <a href="forgot-password.html">
+                        Quên mật khẩu?
+                    </a>
+
+                </div>
+
+                <button type="submit" class="login-button">
+                    Đăng nhập
+                </button>
+
+                <p id="message"></p>
+
+            </form>
+
+            <div class="register-link">
+                Chưa có tài khoản?
+                <a href="register.html">Đăng ký ngay</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Hiện hoặc ẩn mật khẩu
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", function () {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                togglePassword.textContent = "Ẩn";
+            } else {
+                passwordInput.type = "password";
+                togglePassword.textContent = "Hiện";
+            }
+        });
+
+        
+    </script>
+
+
+<script>
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit",async function(event) {
+        event.preventDefault();
+
+        // Lấy dữ liệu người dùng nhập
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+
+        // Kiểm tra tài khoản
+        if (username === "") {
+            alert("Vui lòng nhập email hoặc tên đăng nhập!");
+            return;
+        }
+
+        // Kiểm tra định dạng email nếu người dùng nhập email
+        if (username.includes("@")) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(username)) {
+                alert("Email không hợp lệ!");
+                return;
+            }
+        }
+
+        // Kiểm tra mật khẩu
+        if (password === "") {
+            alert("Vui lòng nhập mật khẩu!");
+            return;
+        }
+      try {
+            const response = await fetch(
+                "http://127.0.0.1:8000/api/auth/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            // Xử lý kết quả đăng nhập
+            if (response.ok) {
+              // Lưu trạng thái đăng nhập
+    localStorage.setItem("isLoggedIn", "true");
+
+    // Lưu thông tin người dùng nếu backend trả về
+    if (result.username) {
+        localStorage.setItem("username", result.username);
+    }
+
+    alert("Đăng nhập thành công!");
+
+    // Chuyển sang Dashboard
+    window.location.replace("dashboard.html");
+            } else {
+                alert(result.detail || "Đăng nhập thất bại!");
+            }
+
+        } catch (error) {
+            console.error("Lỗi đăng nhập:", error);
+            alert("Không thể kết nối đến Backend!");
+        }
+
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký tài khoản | Air Quality Monitoring</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #eaf4ff, #f5f9ff);
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 600px;
+            display: flex;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0, 70, 150, 0.15);
+        }
+
+        /* Phần giới thiệu */
+
+        .left-panel {
+            width: 45%;
+            background: linear-gradient(135deg, #0878e8, #004a9f);
+            color: white;
+            padding: 55px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .left-panel h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .left-panel p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #e3efff;
+        }
+
+        .features {
+            margin-top: 30px;
+            line-height: 2.2;
+            font-size: 15px;
+        }
+
+        /* Phần đăng ký */
+
+        .right-panel {
+            width: 55%;
+            padding: 45px 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right-panel h2 {
+            font-size: 30px;
+            color: #123b68;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #d5dce5;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #0878e8;
+            box-shadow: 0 0 0 3px rgba(8, 120, 232, 0.1);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 70px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #0878e8;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 13px;
+            color: #555;
+            margin: 15px 0;
+        }
+
+        .terms input {
+            width: auto;
+            margin-top: 3px;
+        }
+
+        .terms a {
+            color: #0878e8;
+            text-decoration: none;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #0878e8;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .register-btn:hover {
+            background: #005bbd;
+            transform: translateY(-1px);
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #0878e8;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-panel,
+            .right-panel {
+                width: 100%;
+            }
+
+            .left-panel {
+                padding: 35px 30px;
+            }
+
+            .right-panel {
+                padding: 35px 30px;
+            }
+
+            .left-panel h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Phần giới thiệu hệ thống -->
+    <div class="left-panel">
+        <div class="logo">🌿 Air Quality Monitoring</div>
+
+        <h1>Tham gia hệ thống giám sát chất lượng không khí</h1>
+
+        <p>
+            Tạo tài khoản để theo dõi chất lượng không khí,
+            xem dữ liệu cảm biến và giám sát hoạt động của
+            các thiết bị trong phòng thực hành.
+        </p>
+
+        <div class="features">
+            ✓ Theo dõi dữ liệu cảm biến<br>
+            ✓ Giám sát chất lượng không khí<br>
+            ✓ Phân tích và cảnh báo bằng AI<br>
+            ✓ Điều khiển thiết bị từ xa
+        </div>
+    </div>
+
+    <!-- Form đăng ký -->
+    <div class="right-panel">
+
+        <h2>Tạo tài khoản</h2>
+        <p class="subtitle">Điền thông tin để đăng ký tài khoản mới</p>
+# Form là cả biểu mẫu, gồm nhiều thành phần bên trong, id chính là tên riêng của form
+        <form id="registerForm">
+#div dùng để gom các phần tử lại với nhau thành một khối, class dùng để đặt tên khối, css cũng lấy tên này để thiết kế giao diện
+#label là nhãn mô tả ô nhập dữ liệu
+            <div class="form-group">
+                <label for="fullname">Họ và tên</label>
+                <input
+                    type="text"
+                    id="fullname"
+                    name="fullname"
+                    placeholder="Nhập họ và tên"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Nhập tên đăng nhập"
+                    minlength="4"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Nhập địa chỉ email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+
+                <div class="password-container">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Tối thiểu 8 ký tự"
+                        minlength="8"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('password', this)"
+                    >
+                        Hiện
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Xác nhận mật khẩu</label>
+
+                <div class="password-container">
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Nhập lại mật khẩu"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('confirmPassword', this)"
+                    >
+                        Hiện
+                    </button>
+                </div>
+            </div>
+
+            <div class="terms">
+                <input type="checkbox" id="agreeTerms" required>
+
+                <label for="agreeTerms">
+                    Tôi đồng ý với
+                    <a href="#">điều khoản sử dụng</a>
+                    và chính sách bảo mật.
+                </label>
+            </div>
+
+            <button type="submit" class="register-btn">
+                Đăng ký
+            </button>
+
+            <p id="message" class="message"></p>
+
+        </form>
+
+        <div class="login-link">
+            Đã có tài khoản?
+            <a href="login.html">Đăng nhập</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Hiện hoặc ẩn mật khẩu
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            button.textContent = "Ẩn";
+        } else {
+            input.type = "password";
+            button.textContent = "Hiện";
+        }
+    }
+
+ document.getElementById("registerForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const fullname = document.getElementById("fullname").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const message = document.getElementById("message");
+
+    // Kiểm tra mật khẩu xác nhận
+    if (password !== confirmPassword) {
+        message.style.color = "red";
+        message.textContent = "Mật khẩu xác nhận không khớp!";
+        return;
+    }
+
+    // Hiển thị trạng thái đang đăng ký
+    message.style.color = "#0878e8";
+    message.textContent = "Đang đăng ký tài khoản...";
+
+    try {
+        // Gửi dữ liệu đến Backend
+        const response = await fetch("http://127.0.0.1:8000/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                fullname: fullname,
+                username: username,
+                email: email,
+                password: password
+            })
+        });
+
+        const result = await response.json();
+
+        // Xử lý kết quả từ Backend
+        if (response.ok) {
+            message.style.color = "green";
+            message.textContent = result.message;
+
+            // Chuyển sang trang đăng nhập sau 1 giây
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+
+        } else {
+            message.style.color = "red";
+            message.textContent = result.detail || "Đăng ký thất bại!";
+        }
+
+    } catch (error) {
+        console.error("Lỗi đăng ký:", error);
+
+        message.style.color = "red";
+        message.textContent = "Không thể kết nối đến Backend!";
+    }
+});
+</script>
+
+</body>
+</html>

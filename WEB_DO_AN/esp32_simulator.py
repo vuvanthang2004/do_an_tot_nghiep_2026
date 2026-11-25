@@ -9,16 +9,17 @@ import paho.mqtt.client as mqtt
 # ==================================================
 # 1. CAU HINH MQTT BROKER
 # ==================================================
-
+# Địa chỉ của máy tính hiện tại cũng là địa chỉ của Broker
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 1883
-
+# đây như là một con đường làm ra để chuyển dữ liệu cảm biến từ esp lên backend
 SENSOR_TOPIC = "lab/air/sensor"
+#Đây là con đường truyền lệnh từ backend lên esp để điều khiển các thiết bị chuyển đổi nhiệt độ
 COMMAND_TOPIC = "lab/air/command"
+#ĐÂy là đường truyền để esp gửi trang thái của các thiết bị về backend xem nó bật hay tắt
 DEVICE_STATUS_TOPIC = "lab/air/device_status"
-
+# Đây là mã định danh để cho biết chính xác các client với nhau, để phân biệt rõ các client
 CLIENT_ID = "esp32_simulator_01"
-
 
 # ==================================================
 # 2. TRANG THAI THIET BI GIA LAP
@@ -36,27 +37,27 @@ running = False
 # ==================================================
 # 3. XU LY KHI KET NOI MQTT THANH CONG
 # ==================================================
-
+# Hàm xử lý kết quả kết nối
 def on_connect(client, userdata, flags, reason_code, properties):
     global running
 
     if reason_code == 0:
         running = True
-        print("\n[MQTT] Ket noi Broker thanh cong!")
+        print("\n[MQTT] KẾT NỐI BROKER THÀNH CÔNG!")
 
         # Dang ky nhan lenh tu Backend
         client.subscribe(COMMAND_TOPIC, qos=1)
 
-        print("[MQTT] Da dang ky topic:", COMMAND_TOPIC)
+        print("[MQTT]ĐÃ ĐĂNG KÝ TOPIC:", COMMAND_TOPIC)
     else:
         running = False
-        print("[MQTT] Ket noi that bai:", reason_code)
+        print("[MQTT]KẾT NỐI THẤT BẠI:", reason_code)
 
 
 # ==================================================
 # 4. XU LY LENH NHAN DUOC QUA MQTT
 # ==================================================
-
+# nhận lệnh MQTT từ Backend, cập nhật trạng thái thiết bị mô phỏng và gửi trạng thái mới về Backend
 def on_message(client, userdata, message):
     global devices
 
@@ -64,7 +65,7 @@ def on_message(client, userdata, message):
         payload = message.payload.decode("utf-8")
         command = json.loads(payload)
 
-        print("\n[MQTT] Nhan lenh:", command)
+        print("\n[MQTT] NHẬN LÊNH:", command)
 
         changed = False
 
@@ -74,7 +75,7 @@ def on_message(client, userdata, message):
 
                 # Chi chap nhan trang thai 0 hoac 1
                 if isinstance(value, bool) or value not in (0, 1):
-                    print("[ERROR] Trang thai khong hop le:", device)
+                    print("[ERROR] TRẠNG THÁI KHÔNG HỢP LỆ:", device)
                     continue
 
                 devices[device] = value
@@ -92,7 +93,7 @@ def on_message(client, userdata, message):
             )
 
     except (UnicodeDecodeError, json.JSONDecodeError, TypeError):
-        print("[ERROR] Du lieu lenh MQTT khong hop le!")
+        print("[ERROR] DỮ LIỆU LỆNH MQTT KHÔNG HỢP LỆ!")
 
 
 # ==================================================
@@ -101,25 +102,20 @@ def on_message(client, userdata, message):
 
 def read_simulated_sensors():
     """
-    Tao du lieu gia lap thay cho cam bien that.
-
-    Luu y:
-    - mq2_raw la gia tri ADC gia lap.
-    - dust_raw la gia tri ADC gia lap.
-    - Chua phai ppm hoac PM2.5 da hieu chuan.
+   tạo dữ liệu giả lập, đây là cách để kiểm tra xem dữ liệu được đưa vào backend hay không
     """
 
-    temperature = round(random.uniform(25.0, 35.0), 1)
-    humidity = round(random.uniform(50.0, 80.0), 1)
+    temperature = round(random.uniform(40.0, 45.0), 1)
+    humidity = round(random.uniform(50.0, 100.0), 1)
 
-    mq2_raw = random.randint(500, 2500)
-    dust_raw = random.randint(500, 2000)
+    mq2_raw = random.randint(500, 3000)
+    dust_raw = random.randint(500, 3000)
 
     data = {
         "temperature": temperature,
         "humidity": humidity,
-        "mq2_raw": mq2_raw,
-        "dust_raw": dust_raw,
+        "mq2": mq2_raw/ 4095 * 100,
+        "pm25": dust_raw/ 4095 * 100,
         "timestamp": int(time.time())
     }
 
@@ -165,29 +161,29 @@ def main():
                 )
 
                 if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                    print("\n[SENSOR] Gui du lieu:")
+                    print("\n[SENSOR] GỬI DỮ LIỆU:")
                     print(json.dumps(data, indent=2))
 
-                    print("[DEVICE] Trang thai hien tai:")
+                    print("[DEVICE] TRẠNG THÁI HIỆN TẠI:")
                     print(json.dumps(devices, indent=2))
                 else:
-                    print("[MQTT] Gui du lieu that bai!")
+                    print("[MQTT] GỬI DỮ LIỆU THẤT BẠI!")
 
             else:
-                print("[MQTT] Dang cho ket noi Broker...")
+                print("[MQTT] ĐANG KẾT NỐI CHO BROKER Broker...")
 
             time.sleep(3)
 
     except KeyboardInterrupt:
-        print("\n[INFO] Dang dung chuong trinh...")
+        print("\n[INFO] ĐANG DỪNG CHƯƠNG TRÌNH...")
 
     except OSError as error:
-        print("[ERROR] Khong the ket noi MQTT Broker:", error)
+        print("[ERROR] KHÔNG THỂ KẾT NỐI MQTT Broker:", error)
 
     finally:
         client.loop_stop()
         client.disconnect()
-        print("[INFO] Da ngat ket noi MQTT.")
+        print("[INFO] ĐÃ NGẮT KẾT NỐI MQTT.")
 
 
 if __name__ == "__main__":
